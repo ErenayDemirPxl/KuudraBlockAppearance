@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "kuudraappearance",
+  "version": "${version}",
+  "name": "Kuudra Block Appearance",
+  "description": "Client-side live block appearance replacement for Minecraft 26.1.2.",
+  "authors": ["You"],
+  "license": "MIT",
+  "environment": "client",
+  "entrypoints": {
+    "client": ["dev.kuudraappearance.client.KuudraAppearanceClient"]
+  },
+  "mixins": [
+    { "config": "kuudraappearance.client.mixins.json", "environment": "client" }
+  ],
+  "depends": {
+    "fabricloader": ">=0.19.3",
+    "minecraft": "26.1.2",
+    "java": ">=25",
+    "fabric-api": ">=0.148.0"
+  }
+}

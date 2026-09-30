@@ -1,0 +1,7 @@
+{
+  "required": true,
+  "package": "dev.kuudraappearance.client.mixin",
+  "compatibilityLevel": "JAVA_25",
+  "client": ["BlockStateModelSetMixin"],
+  "injectors": { "defaultRequire": 1 }
+}
