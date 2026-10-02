@@ -11,13 +11,9 @@ import net.minecraft.world.scores.Scoreboard;
 
 import java.util.Locale;
 
-/**
- * Client-side Kuudra instance detection.
- *
- * Hypixel exposes "Area: Kuudra" in the player tab list, so tab-list text is
- * the primary signal. The sidebar remains as a fallback in case Hypixel moves
- * the area line again later.
- */
+/*
+meow
+*/
 public final class KuudraDetector {
     private static volatile boolean inKuudra;
     private static volatile String detectionSource = "NONE";
@@ -42,7 +38,6 @@ public final class KuudraDetector {
         inKuudra = detection.detected;
         detectionSource = detection.source;
 
-        // Chunk models are cached. Rebuild only when entering/leaving Kuudra.
         if (changed && minecraft.levelRenderer != null) {
             minecraft.levelRenderer.allChanged();
         }
@@ -51,7 +46,6 @@ public final class KuudraDetector {
     private static Detection detect(Minecraft minecraft) {
         if (minecraft.level == null) return Detection.none();
 
-        // PRIMARY: Hypixel's tab list includes "Area: Kuudra".
         try {
             ClientPacketListener connection = minecraft.getConnection();
             if (connection != null) {
@@ -64,10 +58,9 @@ public final class KuudraDetector {
                 }
             }
         } catch (Throwable ignored) {
-            // Keep going; sidebar fallback may still work.
+           
         }
 
-        // FALLBACK: scoreboard/sidebar text.
         try {
             Scoreboard scoreboard = minecraft.level.getScoreboard();
             Objective sidebar = scoreboard.getDisplayObjective(DisplaySlot.SIDEBAR);
@@ -85,7 +78,7 @@ public final class KuudraDetector {
                 }
             }
         } catch (Throwable ignored) {
-            // Detection simply remains off for this refresh.
+           
         }
 
         return Detection.none();
