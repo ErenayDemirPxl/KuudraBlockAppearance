@@ -33,24 +33,24 @@ public final class BlockAppearanceScreen extends Screen {
     private enum Tab { EDITOR, CHANGED, KUUDRA_BLOCKS, PRESETS, SAVES, CONFIG }
 
     // KBA palette (ARGB)
-    private static final int BG = 0xE60D0507;
-    private static final int PANEL = 0xFF1A0A10;
-    private static final int PANEL_BORDER = 0xFF4A1626;
-    private static final int PANEL_TOP_ACCENT = 0xFFE0283C;
-    private static final int SOURCE_ACCENT = 0xFFE0283C;
-    private static final int APPEARANCE_ACCENT = 0xFFC2187A;
-    private static final int TEXT = 0xFFF5ECEF;
-    private static final int MUTED = 0xFFC3A7B1;
-    private static final int DANGER = 0xFF8A1F3A;
+    private static final int BG = 0xF00D0E11;
+    private static final int PANEL = 0xFF18191E;
+    private static final int PANEL_BORDER = 0xFF323037;
+    private static final int PANEL_TOP_ACCENT = 0xFF24252B;
+    private static final int SOURCE_ACCENT = 0xFFC64B54;
+    private static final int APPEARANCE_ACCENT = 0xFFAC6067;
+    private static final int TEXT = 0xFFF0ECEE;
+    private static final int MUTED = 0xFF99979E;
+    private static final int DANGER = 0xFF82383E;
     private static final int HOVER = 0x0DFFFFFF;
-    private static final int SELECTED = 0x26E0283C;
+    private static final int SELECTED = 0x553D2227;
     private static final int SUCCESS = 0xFF69D38B;
     private static final int DARK_TEXT = 0xFFF5ECEF;
 
-    private static final int OUTER = 16;
+    private static final int OUTER = 152;
     private static final int GAP = 12;
     private static final int ROW_H = 20;
-    private static final int BODY_TOP = 66;
+    private static final int BODY_TOP = 48;
     private static final int FOOTER_H = 26;
 
     private final Screen parent;
@@ -112,7 +112,7 @@ public final class BlockAppearanceScreen extends Screen {
 
     private int bodyBottom() { return Math.max(BODY_TOP + 120, this.height - FOOTER_H - 8); }
     private int bodyHeight() { return bodyBottom() - BODY_TOP; }
-    private int usableWidth() { return Math.max(260, this.width - OUTER * 2); }
+    private int usableWidth() { return Math.max(260, this.width - OUTER - 16); }
     private int editorLeftWidth() { return Math.max(180, (usableWidth() - GAP) * 56 / 100); }
     private int editorRightX() { return OUTER + editorLeftWidth() + GAP; }
     private int editorRightWidth() { return Math.max(150, usableWidth() - GAP - editorLeftWidth()); }
@@ -365,7 +365,7 @@ public final class BlockAppearanceScreen extends Screen {
     private void panel(GuiGraphicsExtractor g, int x, int y, int w, int h) {
         g.fill(x, y, x + w, y + h, PANEL);
         outline(g, x, y, w, h, PANEL_BORDER);
-        g.fill(x + 1, y + 1, x + w - 1, y + 3, PANEL_TOP_ACCENT);
+        // Flat panels; no decorative glow or gradients.
     }
 
     private void outline(GuiGraphicsExtractor g, int x, int y, int w, int h, int color) {
@@ -395,51 +395,44 @@ public final class BlockAppearanceScreen extends Screen {
     }
 
     private void renderHeaderAndTabs(GuiGraphicsExtractor g, int mouseX, int mouseY) {
-        g.text(this.font, "Kuudra Mod Editor", OUTER, 15, TEXT, true);
-
-        String pill = KuudraDetector.isInKuudra() ? "KUUDRA ACTIVE" : "OUTSIDE KUUDRA";
-        int pillW = this.font.width(pill) + 16;
-        int pillX = this.width - OUTER - pillW;
-        int pillColor = KuudraDetector.isInKuudra() ? SUCCESS : SOURCE_ACCENT;
-        g.fill(pillX, 10, pillX + pillW, 29, PANEL);
-        outline(g, pillX, 10, pillW, 19, pillColor);
-        centeredShadow(g, pill, pillX + pillW / 2, 16, pillColor);
+        // Dedicated sidebar. The main content retains the existing KBA functionality.
+        g.fill(8, 8, 142, this.height - 8, PANEL);
+        outline(g, 8, 8, 134, this.height - 16, PANEL_BORDER);
+        g.text(this.font, "KBA", 22, 23, TEXT, true);
+        g.text(this.font, "Kuudra Block Appearance", 22, 38, MUTED, false);
+        g.fill(20, 58, 130, 59, PANEL_BORDER);
 
         String[] labels = {"Editor", "Changed", "Kuudra Blocks", "Presets", "Saves", "Config"};
-        int x = OUTER;
-        int y = 40;
-        int spacing = 18;
         for (int i = 0; i < labels.length; i++) {
-            int w = this.font.width(labels[i]);
+            int y = 70 + i * 29;
             boolean active = tab.ordinal() == i;
-            int color = active ? TEXT : MUTED;
-            if (active) g.fill(x - 4, y - 3, x + w + 4, y + 16, 0x22E0283C);
-            g.text(this.font, labels[i], x, y, color, true);
-            if (active) g.fill(x, y + 13, x + w, y + 16, SOURCE_ACCENT);
-            x += w + spacing;
+            boolean hover = inside(mouseX, mouseY, 16, y, 118, 25);
+            if (active || hover) {
+                g.fill(16, y, 134, y + 25, active ? 0xFF342126 : 0xFF24252B);
+            }
+            if (active) g.fill(16, y, 19, y + 25, SOURCE_ACCENT);
+            g.text(this.font, labels[i], 28, y + 8, active ? TEXT : MUTED, false);
         }
+
+        g.text(this.font, "BLOCK APPEARANCE", OUTER + 10, 19, TEXT, true);
+        g.fill(OUTER, 37, this.width - 16, 38, PANEL_BORDER);
     }
 
     private Tab tabAt(double mx, double my) {
-        if (my < 37 || my >= 58) return null;
-        String[] labels = {"Editor", "Changed", "Kuudra Blocks", "Presets", "Saves", "Config"};
-        int x = OUTER;
-        int spacing = 18;
-        for (int i = 0; i < labels.length; i++) {
-            int w = this.font.width(labels[i]);
-            if (mx >= x - 3 && mx < x + w + 3) return Tab.values()[i];
-            x += w + spacing;
-        }
-        return null;
+        if (mx < 16 || mx >= 134 || my < 70) return null;
+        int index = (int) ((my - 70) / 29);
+        if (index < 0 || index >= Tab.values().length) return null;
+        int y = 70 + index * 29;
+        return my < y + 25 ? Tab.values()[index] : null;
     }
 
     private void renderFooter(GuiGraphicsExtractor g) {
         int y = this.height - FOOTER_H;
-        g.fill(OUTER, y, this.width - OUTER, y + 1, PANEL_BORDER);
+        g.fill(OUTER, y, this.width - 16, y + 1, PANEL_BORDER);
         String scope = KuudraDetector.isInKuudra()
                 ? "Kuudra detected via " + KuudraDetector.detectionSource() + " — replacements active"
                 : "Outside Kuudra — replacements disabled";
-        g.centeredText(this.font, scope, this.width / 2, y + 9, KuudraDetector.isInKuudra() ? MUTED : SOURCE_ACCENT);
+        g.centeredText(this.font, scope, OUTER + usableWidth() / 2, y + 9, MUTED);
     }
 
     private void renderScrollBar(GuiGraphicsExtractor g, int x, int y, int h, int itemCount, double scroll) {
