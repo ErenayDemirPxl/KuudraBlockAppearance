@@ -108,8 +108,8 @@ public final class BlockAppearanceScreen extends Screen {
         init();
     }
 
-    private int windowWidth() { return Math.min(1080, Math.max(580, this.width - 48)); }
-    private int windowHeight() { return Math.min(630, Math.max(350, this.height - 48)); }
+    private int windowWidth() { return Math.min(820, Math.max(580, this.width - 72)); }
+    private int windowHeight() { return Math.min(510, Math.max(350, this.height - 72)); }
     private int windowX() { return (this.width - windowWidth()) / 2; }
     private int windowY() { return (this.height - windowHeight()) / 2; }
     private int windowRight() { return windowX() + windowWidth(); }
@@ -368,10 +368,32 @@ public final class BlockAppearanceScreen extends Screen {
     private int savesListY() { return bodyTop() + 70; }
     private int savesListHeight() { return Math.max(50, bodyBottom() - savesListY() - 12); }
 
+    // Small corner radius, rendered with rectangles to avoid textures or shaders.
+    private void roundedFill(GuiGraphicsExtractor g, int x, int y, int w, int h, int color) {
+        if (w < 6 || h < 6) return;
+        g.fill(x + 3, y, x + w - 3, y + h, color);
+        g.fill(x + 1, y + 1, x + w - 1, y + h - 1, color);
+        g.fill(x, y + 3, x + w, y + h - 3, color);
+    }
+
+    private void roundedOutline(GuiGraphicsExtractor g, int x, int y, int w, int h, int color) {
+        g.fill(x + 3, y, x + w - 3, y + 1, color);
+        g.fill(x + 3, y + h - 1, x + w - 3, y + h, color);
+        g.fill(x, y + 3, x + 1, y + h - 3, color);
+        g.fill(x + w - 1, y + 3, x + w, y + h - 3, color);
+        g.fill(x + 1, y + 1, x + 3, y + 2, color);
+        g.fill(x + w - 3, y + 1, x + w - 1, y + 2, color);
+        g.fill(x + 1, y + h - 2, x + 3, y + h - 1, color);
+        g.fill(x + w - 3, y + h - 2, x + w - 1, y + h - 1, color);
+        g.fill(x + 1, y + 2, x + 2, y + 3, color);
+        g.fill(x + w - 2, y + 2, x + w - 1, y + 3, color);
+        g.fill(x + 1, y + h - 3, x + 2, y + h - 2, color);
+        g.fill(x + w - 2, y + h - 3, x + w - 1, y + h - 2, color);
+    }
+
     private void panel(GuiGraphicsExtractor g, int x, int y, int w, int h) {
-        g.fill(x, y, x + w, y + h, PANEL);
-        outline(g, x, y, w, h, PANEL_BORDER);
-        // Flat panels; no decorative glow or gradients.
+        roundedFill(g, x, y, w, h, PANEL);
+        roundedOutline(g, x, y, w, h, PANEL_BORDER);
     }
 
     private void outline(GuiGraphicsExtractor g, int x, int y, int w, int h, int color) {
@@ -387,8 +409,8 @@ public final class BlockAppearanceScreen extends Screen {
 
     private void renderButton(GuiGraphicsExtractor g, int mouseX, int mouseY, int x, int y, int w, int h, String label, int fill, int border, int textColor) {
         boolean hover = inside(mouseX, mouseY, x, y, w, h);
-        g.fill(x, y, x + w, y + h, hover ? lighten(fill) : fill);
-        outline(g, x, y, w, h, border);
+        roundedFill(g, x, y, w, h, hover ? lighten(fill) : fill);
+        roundedOutline(g, x, y, w, h, border);
         centeredShadow(g, label, x + w / 2, y + (h - 8) / 2, textColor);
     }
 
@@ -402,20 +424,21 @@ public final class BlockAppearanceScreen extends Screen {
 
     private void renderHeaderAndTabs(GuiGraphicsExtractor g, int mouseX, int mouseY) {
         int wx = windowX(), wy = windowY(), ww = windowWidth(), wh = windowHeight();
-        g.fill(wx, wy, wx + ww, wy + wh, 0xFF101115);
-        outline(g, wx, wy, ww, wh, PANEL_BORDER);
-        g.fill(wx + 8, wy + 8, wx + 142, wy + wh - 8, PANEL);
+        roundedFill(g, wx, wy, ww, wh, 0xFF101115);
+        roundedOutline(g, wx, wy, ww, wh, PANEL_BORDER);
+        roundedFill(g, wx + 8, wy + 8, 134, wh - 16, PANEL);
         g.fill(wx + 142, wy + 8, wx + 143, wy + wh - 8, PANEL_BORDER);
         g.text(this.font, "KBA", wx + 22, wy + 22, TEXT, true);
-        g.text(this.font, "Kuudra Block Appearance", wx + 22, wy + 39, MUTED, false);
-        g.fill(wx + 20, wy + 58, wx + 130, wy + 59, PANEL_BORDER);
+        g.text(this.font, "Kuudra Block", wx + 22, wy + 37, MUTED, false);
+        g.text(this.font, "Appearance", wx + 22, wy + 49, MUTED, false);
+        g.fill(wx + 20, wy + 68, wx + 130, wy + 69, PANEL_BORDER);
 
         String[] labels = {"Editor", "Changed", "Kuudra Blocks", "Presets", "Saves", "Config"};
         for (int i = 0; i < labels.length; i++) {
-            int y = wy + 70 + i * 29;
+            int y = wy + 80 + i * 29;
             boolean active = tab.ordinal() == i;
             boolean hover = inside(mouseX, mouseY, wx + 16, y, 118, 25);
-            if (active || hover) g.fill(wx + 16, y, wx + 134, y + 25, active ? 0xFF342126 : 0xFF24252B);
+            if (active || hover) roundedFill(g, wx + 16, y, 118, 25, active ? 0xFF342126 : 0xFF24252B);
             if (active) g.fill(wx + 16, y, wx + 19, y + 25, SOURCE_ACCENT);
             g.text(this.font, labels[i], wx + 28, y + 8, active ? TEXT : MUTED, false);
         }
@@ -423,10 +446,10 @@ public final class BlockAppearanceScreen extends Screen {
 
     private Tab tabAt(double mx, double my) {
         int wx = windowX(), wy = windowY();
-        if (mx < wx + 16 || mx >= wx + 134 || my < wy + 70) return null;
-        int index = (int) ((my - wy - 70) / 29);
+        if (mx < wx + 16 || mx >= wx + 134 || my < wy + 80) return null;
+        int index = (int) ((my - wy - 80) / 29);
         if (index < 0 || index >= Tab.values().length) return null;
-        int y = wy + 70 + index * 29;
+        int y = wy + 80 + index * 29;
         return my < y + 25 ? Tab.values()[index] : null;
     }
 
