@@ -14,6 +14,7 @@ import net.minecraft.resources.Identifier;
 
 public final class KuudraAppearanceClient implements ClientModInitializer {
     private static KeyMapping openMenuKey;
+    private static boolean openMenuRequested;
 
     @Override
     public void onInitializeClient() {
@@ -26,14 +27,18 @@ public final class KuudraAppearanceClient implements ClientModInitializer {
 
         ClientCommandRegistrationCallback.EVENT.register((dispatcher, commandBuildContext) -> {
             dispatcher.register(ClientCommands.literal("kba").executes(context -> {
-                var client = context.getSource().getClient();
-                client.setScreen(new BlockAppearanceScreen(client.screen));
+                // Open on the next client tick, after the chat screen finishes closing.
+                openMenuRequested = true;
                 return 1;
             }));
         });
 
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             KuudraDetector.tick(client);
+            if (openMenuRequested) {
+                openMenuRequested = false;
+                client.setScreen(new BlockAppearanceScreen(client.screen));
+            }
             while (openMenuKey.consumeClick()) client.setScreen(new BlockAppearanceScreen(client.screen));
         });
     }
