@@ -47,9 +47,9 @@ public final class BlockAppearanceScreen extends Screen {
     private static final int SUCCESS = 0xFF69D38B;
     private static final int DARK_TEXT = 0xFFF5ECEF;
 
-    private static final int GAP = 12;
-    private static final int ROW_H = 20;
-    private static final int FOOTER_H = 26;
+    private static final int GAP = 8;
+    private static final int ROW_H = 18;
+    private static final int FOOTER_H = 22;
 
     private final Screen parent;
     private Tab tab = Tab.EDITOR;
@@ -108,22 +108,22 @@ public final class BlockAppearanceScreen extends Screen {
         init();
     }
 
-    private int windowWidth() { return Math.min(820, Math.max(580, this.width - 72)); }
-    private int windowHeight() { return Math.min(510, Math.max(350, this.height - 72)); }
+    private int windowWidth() { return Math.min(690, Math.max(540, this.width - 72)); }
+    private int windowHeight() { return Math.min(430, Math.max(350, this.height - 72)); }
     private int windowX() { return (this.width - windowWidth()) / 2; }
     private int windowY() { return (this.height - windowHeight()) / 2; }
     private int windowRight() { return windowX() + windowWidth(); }
     private int windowBottom() { return windowY() + windowHeight(); }
-    private int outer() { return windowX() + 152; }
-    private int bodyTop() { return windowY() + 44; }
+    private int outer() { return windowX() + 138; }
+    private int bodyTop() { return windowY() + 18; }
     private int bodyBottom() { return windowBottom() - FOOTER_H - 8; }
     private int bodyHeight() { return bodyBottom() - bodyTop(); }
     private int usableWidth() { return windowRight() - outer() - 16; }
-    private int editorLeftWidth() { return Math.max(180, (usableWidth() - GAP) * 56 / 100); }
+    private int editorLeftWidth() { return Math.max(180, (usableWidth() - GAP) * 52 / 100); }
     private int editorRightX() { return outer() + editorLeftWidth() + GAP; }
     private int editorRightWidth() { return Math.max(150, usableWidth() - GAP - editorLeftWidth()); }
-    private int editorListY() { return bodyTop() + 86; }
-    private int editorListHeight() { return Math.max(48, bodyBottom() - editorListY() - 12); }
+    private int editorListY() { return bodyTop() + 79; }
+    private int editorListHeight() { return Math.max(48, bodyBottom() - editorListY() - 8); }
 
     private void buildEditor() {
         int leftX = outer();
@@ -363,9 +363,9 @@ public final class BlockAppearanceScreen extends Screen {
     private int firstVisibleRow(double scroll) { return Math.max(0, (int) (scroll / ROW_H)); }
     private int rowYOffset(double scroll) { return -((int) scroll % ROW_H); }
     private boolean inside(double mx, double my, int x, int y, int w, int h) { return mx >= x && mx < x + w && my >= y && my < y + h; }
-    private int genericListY() { return bodyTop() + 36; }
+    private int genericListY() { return bodyTop() + 32; }
     private int genericListHeight() { return Math.max(50, bodyBottom() - genericListY() - 12); }
-    private int savesListY() { return bodyTop() + 70; }
+    private int savesListY() { return bodyTop() + 66; }
     private int savesListHeight() { return Math.max(50, bodyBottom() - savesListY() - 12); }
 
     // Small corner radius, rendered with rectangles to avoid textures or shaders.
@@ -426,31 +426,31 @@ public final class BlockAppearanceScreen extends Screen {
         int wx = windowX(), wy = windowY(), ww = windowWidth(), wh = windowHeight();
         roundedFill(g, wx, wy, ww, wh, 0xFF101115);
         roundedOutline(g, wx, wy, ww, wh, PANEL_BORDER);
-        roundedFill(g, wx + 8, wy + 8, 134, wh - 16, PANEL);
-        g.fill(wx + 142, wy + 8, wx + 143, wy + wh - 8, PANEL_BORDER);
+        roundedFill(g, wx + 8, wy + 8, 120, wh - 16, PANEL);
+        g.fill(wx + 128, wy + 8, wx + 129, wy + wh - 8, PANEL_BORDER);
         g.text(this.font, "KBA", wx + 22, wy + 22, TEXT, true);
         g.text(this.font, "Kuudra Block", wx + 22, wy + 37, MUTED, false);
         g.text(this.font, "Appearance", wx + 22, wy + 49, MUTED, false);
-        g.fill(wx + 20, wy + 68, wx + 130, wy + 69, PANEL_BORDER);
+        g.fill(wx + 20, wy + 68, wx + 116, wy + 69, PANEL_BORDER);
 
         String[] labels = {"Editor", "Changed", "Kuudra Blocks", "Presets", "Saves", "Config"};
         for (int i = 0; i < labels.length; i++) {
-            int y = wy + 80 + i * 29;
+            int y = wy + 80 + i * 27;
             boolean active = tab.ordinal() == i;
             boolean hover = inside(mouseX, mouseY, wx + 16, y, 118, 25);
-            if (active || hover) roundedFill(g, wx + 16, y, 118, 25, active ? 0xFF342126 : 0xFF24252B);
-            if (active) g.fill(wx + 16, y, wx + 19, y + 25, SOURCE_ACCENT);
+            if (active || hover) roundedFill(g, wx + 16, y, 104, 23, active ? 0xFF342126 : 0xFF24252B);
+            if (active) g.fill(wx + 16, y, wx + 19, y + 23, SOURCE_ACCENT);
             g.text(this.font, labels[i], wx + 28, y + 8, active ? TEXT : MUTED, false);
         }
     }
 
     private Tab tabAt(double mx, double my) {
         int wx = windowX(), wy = windowY();
-        if (mx < wx + 16 || mx >= wx + 134 || my < wy + 80) return null;
-        int index = (int) ((my - wy - 80) / 29);
+        if (mx < wx + 16 || mx >= wx + 120 || my < wy + 80) return null;
+        int index = (int) ((my - wy - 80) / 27);
         if (index < 0 || index >= Tab.values().length) return null;
-        int y = wy + 80 + index * 29;
-        return my < y + 25 ? Tab.values()[index] : null;
+        int y = wy + 80 + index * 27;
+        return my < y + 23 ? Tab.values()[index] : null;
     }
 
     private void renderFooter(GuiGraphicsExtractor g) {
@@ -487,7 +487,7 @@ public final class BlockAppearanceScreen extends Screen {
         g.text(this.font, "Blocks", leftX + 12, bodyTop() + 11, TEXT, true);
         g.text(this.font, "⌕", leftX + 14, bodyTop() + 36, MUTED, true);
 
-        int toggleY = bodyTop() + 58;
+        int toggleY = bodyTop() + 54;
         int toggleX = leftX + 12;
         int toggleW = Math.min(104, Math.max(72, (leftW - 30) / 2));
         renderToggle(g, mouseX, mouseY, toggleX, toggleY, toggleW, "Source", !listSetsReplacement, SOURCE_ACCENT);
@@ -498,8 +498,8 @@ public final class BlockAppearanceScreen extends Screen {
         g.text(this.font, "Source", rightX + 12, bodyTop() + 18, SOURCE_ACCENT, true);
         g.text(this.font, "Appearance", rightX + 12, bodyTop() + 66, APPEARANCE_ACCENT, true);
 
-        int previewY = bodyTop() + 116;
-        int previewH = 78;
+        int previewY = bodyTop() + 108;
+        int previewH = 62;
         g.fill(rightX + 12, previewY, rightX + rightW - 12, previewY + previewH, 0x66110E14);
         outline(g, rightX + 12, previewY, rightW - 24, previewH, PANEL_BORDER);
         g.text(this.font, "Preview", rightX + 22, previewY + 8, MUTED, true);
@@ -514,14 +514,14 @@ public final class BlockAppearanceScreen extends Screen {
         g.text(this.font, "→", rightX + rightW / 2 - 3, centerY - 4, MUTED, true);
         if (!toIcon.isEmpty()) g.item(toIcon, targetX, centerY - 8);
 
-        int buttonY = previewY + previewH + 12;
+        int buttonY = previewY + previewH + 8;
         renderButton(g, mouseX, mouseY, rightX + 12, buttonY, rightW - 24, 22, "Apply", SOURCE_ACCENT, SOURCE_ACCENT, DARK_TEXT);
         int half = (rightW - 30) / 2;
-        renderButton(g, mouseX, mouseY, rightX + 12, buttonY + 30, half, 22, "Reset block", PANEL, PANEL_BORDER, TEXT);
+        renderButton(g, mouseX, mouseY, rightX + 12, buttonY + 26, half, 22, "Reset block", PANEL, PANEL_BORDER, TEXT);
         String resetAllText = System.currentTimeMillis() < resetAllArmedUntil ? "Confirm reset all" : "Reset all";
-        renderButton(g, mouseX, mouseY, rightX + 18 + half, buttonY + 30, half, 22, resetAllText, PANEL, DANGER, TEXT);
+        renderButton(g, mouseX, mouseY, rightX + 18 + half, buttonY + 26, half, 22, resetAllText, PANEL, DANGER, TEXT);
 
-        if (!status.isBlank()) g.text(this.font, status, rightX + 12, Math.min(bodyBottom() - 16, buttonY + 62), MUTED, true);
+        if (!status.isBlank()) g.text(this.font, status, rightX + 12, Math.min(bodyBottom() - 16, buttonY + 54), MUTED, true);
     }
 
     private void renderToggle(GuiGraphicsExtractor g, int mouseX, int mouseY, int x, int y, int w, String label, boolean active, int accent) {
@@ -726,7 +726,7 @@ public final class BlockAppearanceScreen extends Screen {
 
             if (tab == Tab.EDITOR) {
                 int leftX = outer(), leftW = editorLeftWidth();
-                int toggleY = bodyTop() + 58;
+                int toggleY = bodyTop() + 54;
                 int toggleX = leftX + 12;
                 int toggleW = Math.min(104, Math.max(72, (leftW - 30) / 2));
                 if (inside(mx, my, toggleX, toggleY, toggleW, 20)) { listSetsReplacement = false; return true; }
@@ -751,12 +751,12 @@ public final class BlockAppearanceScreen extends Screen {
                 }
 
                 int rightX = editorRightX(), rightW = editorRightWidth();
-                int previewY = bodyTop() + 116, previewH = 78;
-                int buttonY = previewY + previewH + 12;
+                int previewY = bodyTop() + 108, previewH = 62;
+                int buttonY = previewY + previewH + 8;
                 if (inside(mx, my, rightX + 12, buttonY, rightW - 24, 22)) { apply(); return true; }
                 int half = (rightW - 30) / 2;
-                if (inside(mx, my, rightX + 12, buttonY + 30, half, 22)) { reset(); return true; }
-                if (inside(mx, my, rightX + 18 + half, buttonY + 30, half, 22)) { resetAll(); return true; }
+                if (inside(mx, my, rightX + 12, buttonY + 26, half, 22)) { reset(); return true; }
+                if (inside(mx, my, rightX + 18 + half, buttonY + 26, half, 22)) { resetAll(); return true; }
             } else if (tab == Tab.CHANGED) {
                 List<Map.Entry<String, BlockAppearanceConfig.Rule>> rules = sortedRules();
                 int x = outer() + 12, y = genericListY(), w = usableWidth() - 24, h = genericListHeight();
