@@ -108,14 +108,14 @@ public final class BlockAppearanceScreen extends Screen {
         init();
     }
 
-    private int windowWidth() { return Math.min(690, Math.max(540, this.width - 72)); }
-    private int windowHeight() { return Math.min(430, Math.max(350, this.height - 72)); }
+    private int windowWidth() { return Math.min(590, Math.max(510, this.width - 72)); }
+    private int windowHeight() { return Math.min(370, Math.max(340, this.height - 72)); }
     private int windowX() { return (this.width - windowWidth()) / 2; }
     private int windowY() { return (this.height - windowHeight()) / 2; }
     private int windowRight() { return windowX() + windowWidth(); }
     private int windowBottom() { return windowY() + windowHeight(); }
-    private int outer() { return windowX() + 138; }
-    private int bodyTop() { return windowY() + 18; }
+    private int outer() { return windowX() + 142; }
+    private int bodyTop() { return windowY() + 12; }
     private int bodyBottom() { return windowBottom() - FOOTER_H - 8; }
     private int bodyHeight() { return bodyBottom() - bodyTop(); }
     private int usableWidth() { return windowRight() - outer() - 16; }
@@ -368,27 +368,30 @@ public final class BlockAppearanceScreen extends Screen {
     private int savesListY() { return bodyTop() + 66; }
     private int savesListHeight() { return Math.max(50, bodyBottom() - savesListY() - 12); }
 
-    // Small corner radius, rendered with rectangles to avoid textures or shaders.
+    // Rounded rectangles use eight inset scanlines, no textures or shader effects.
     private void roundedFill(GuiGraphicsExtractor g, int x, int y, int w, int h, int color) {
-        if (w < 6 || h < 6) return;
-        g.fill(x + 3, y, x + w - 3, y + h, color);
-        g.fill(x + 1, y + 1, x + w - 1, y + h - 1, color);
-        g.fill(x, y + 3, x + w, y + h - 3, color);
+        if (w < 18 || h < 18) { g.fill(x, y, x + w, y + h, color); return; }
+        int[] inset = {5, 3, 2, 1, 1, 0, 0, 0};
+        for (int i = 0; i < 8; i++) {
+            g.fill(x + inset[i], y + i, x + w - inset[i], y + i + 1, color);
+            g.fill(x + inset[i], y + h - i - 1, x + w - inset[i], y + h - i, color);
+        }
+        g.fill(x, y + 8, x + w, y + h - 8, color);
     }
 
     private void roundedOutline(GuiGraphicsExtractor g, int x, int y, int w, int h, int color) {
-        g.fill(x + 3, y, x + w - 3, y + 1, color);
-        g.fill(x + 3, y + h - 1, x + w - 3, y + h, color);
-        g.fill(x, y + 3, x + 1, y + h - 3, color);
-        g.fill(x + w - 1, y + 3, x + w, y + h - 3, color);
-        g.fill(x + 1, y + 1, x + 3, y + 2, color);
-        g.fill(x + w - 3, y + 1, x + w - 1, y + 2, color);
-        g.fill(x + 1, y + h - 2, x + 3, y + h - 1, color);
-        g.fill(x + w - 3, y + h - 2, x + w - 1, y + h - 1, color);
-        g.fill(x + 1, y + 2, x + 2, y + 3, color);
-        g.fill(x + w - 2, y + 2, x + w - 1, y + 3, color);
-        g.fill(x + 1, y + h - 3, x + 2, y + h - 2, color);
-        g.fill(x + w - 2, y + h - 3, x + w - 1, y + h - 2, color);
+        if (w < 18 || h < 18) { outline(g, x, y, w, h, color); return; }
+        int[] inset = {5, 3, 2, 1, 1, 0, 0, 0};
+        g.fill(x + 5, y, x + w - 5, y + 1, color);
+        g.fill(x + 5, y + h - 1, x + w - 5, y + h, color);
+        for (int i = 1; i < 8; i++) {
+            g.fill(x + inset[i], y + i, x + inset[i] + 1, y + i + 1, color);
+            g.fill(x + w - inset[i] - 1, y + i, x + w - inset[i], y + i + 1, color);
+            g.fill(x + inset[i], y + h - i - 1, x + inset[i] + 1, y + h - i, color);
+            g.fill(x + w - inset[i] - 1, y + h - i - 1, x + w - inset[i], y + h - i, color);
+        }
+        g.fill(x, y + 8, x + 1, y + h - 8, color);
+        g.fill(x + w - 1, y + 8, x + w, y + h - 8, color);
     }
 
     private void panel(GuiGraphicsExtractor g, int x, int y, int w, int h) {
@@ -404,7 +407,7 @@ public final class BlockAppearanceScreen extends Screen {
     }
 
     private void centeredShadow(GuiGraphicsExtractor g, String text, int centerX, int y, int color) {
-        g.text(this.font, text, centerX - this.font.width(text) / 2, y, color, true);
+        g.text(this.font, text, centerX - this.font.width(text) / 2, y, color, false);
     }
 
     private void renderButton(GuiGraphicsExtractor g, int mouseX, int mouseY, int x, int y, int w, int h, String label, int fill, int border, int textColor) {
@@ -426,9 +429,9 @@ public final class BlockAppearanceScreen extends Screen {
         int wx = windowX(), wy = windowY(), ww = windowWidth(), wh = windowHeight();
         roundedFill(g, wx, wy, ww, wh, 0xFF101115);
         roundedOutline(g, wx, wy, ww, wh, PANEL_BORDER);
-        roundedFill(g, wx + 8, wy + 8, 120, wh - 16, PANEL);
-        g.fill(wx + 128, wy + 8, wx + 129, wy + wh - 8, PANEL_BORDER);
-        g.text(this.font, "KBA", wx + 22, wy + 22, TEXT, true);
+        roundedFill(g, wx + 8, wy + 8, 124, wh - 16, PANEL);
+        g.fill(wx + 132, wy + 8, wx + 133, wy + wh - 8, PANEL_BORDER);
+        g.text(this.font, "KBA", wx + 22, wy + 22, TEXT, false);
         g.text(this.font, "Kuudra Block", wx + 22, wy + 37, MUTED, false);
         g.text(this.font, "Appearance", wx + 22, wy + 49, MUTED, false);
         g.fill(wx + 20, wy + 68, wx + 116, wy + 69, PANEL_BORDER);
@@ -438,7 +441,7 @@ public final class BlockAppearanceScreen extends Screen {
             int y = wy + 80 + i * 27;
             boolean active = tab.ordinal() == i;
             boolean hover = inside(mouseX, mouseY, wx + 16, y, 118, 25);
-            if (active || hover) roundedFill(g, wx + 16, y, 104, 23, active ? 0xFF342126 : 0xFF24252B);
+            if (active || hover) roundedFill(g, wx + 16, y, 108, 23, active ? 0xFF342126 : 0xFF24252B);
             if (active) g.fill(wx + 16, y, wx + 19, y + 23, SOURCE_ACCENT);
             g.text(this.font, labels[i], wx + 28, y + 8, active ? TEXT : MUTED, false);
         }
@@ -446,7 +449,7 @@ public final class BlockAppearanceScreen extends Screen {
 
     private Tab tabAt(double mx, double my) {
         int wx = windowX(), wy = windowY();
-        if (mx < wx + 16 || mx >= wx + 120 || my < wy + 80) return null;
+        if (mx < wx + 16 || mx >= wx + 124 || my < wy + 80) return null;
         int index = (int) ((my - wy - 80) / 27);
         if (index < 0 || index >= Tab.values().length) return null;
         int y = wy + 80 + index * 27;
@@ -556,11 +559,11 @@ public final class BlockAppearanceScreen extends Screen {
             ItemStack icon = blockIcon(id);
             if (!icon.isEmpty()) g.item(icon, x + 5, yy + 2);
             String name = BlockCatalog.displayName(id);
-            g.text(this.font, name, x + 26, yy + 6, TEXT, true);
+            g.text(this.font, name, x + 26, yy + 5, TEXT, false);
             int idW = this.font.width(id);
             int right = x + w - 12;
             if (x + 32 + this.font.width(name) + 10 < right - idW) {
-                g.text(this.font, id, right - idW, yy + 6, MUTED, true);
+                g.text(this.font, id, right - idW, yy + 5, MUTED, false);
             }
         }
         g.disableScissor();
@@ -585,12 +588,12 @@ public final class BlockAppearanceScreen extends Screen {
             ItemStack fromIcon = blockIcon(from), toIcon = blockIcon(to);
             if (!fromIcon.isEmpty()) g.item(fromIcon, x + 4, yy + 2);
             int tx = x + 26;
-            g.text(this.font, from, tx, yy + 6, TEXT, true);
+            g.text(this.font, from, tx, yy + 5, TEXT, false);
             int arrowX = Math.min(x + w / 2 - 16, tx + this.font.width(from) + 12);
             g.text(this.font, "→", arrowX, yy + 6, MUTED, true);
             int targetX = arrowX + 20;
             if (!toIcon.isEmpty()) g.item(toIcon, targetX, yy + 2);
-            g.text(this.font, to, targetX + 22, yy + 6, TEXT, true);
+            g.text(this.font, to, targetX + 22, yy + 5, TEXT, false);
             int removeW = 58, removeX = x + w - removeW - 6;
             renderButton(g, mouseX, mouseY, removeX, yy + 1, removeW, 18, "Remove", PANEL, DANGER, TEXT);
         }
@@ -614,7 +617,7 @@ public final class BlockAppearanceScreen extends Screen {
             if (hover) g.fill(x, yy, x + w - 4, yy + ROW_H - 1, HOVER);
             ItemStack icon = blockIcon(id);
             if (!icon.isEmpty()) g.item(icon, x + 4, yy + 2);
-            g.text(this.font, BlockCatalog.displayName(id), x + 26, yy + 6, TEXT, true);
+            g.text(this.font, BlockCatalog.displayName(id), x + 26, yy + 5, TEXT, false);
             int idW = this.font.width(id);
             g.text(this.font, id, x + w - idW - 12, yy + 6, MUTED, true);
         }
@@ -656,7 +659,7 @@ public final class BlockAppearanceScreen extends Screen {
         for (int i = first; i < names.size() && yy < y + h; i++, yy += ROW_H) {
             String name = names.get(i);
             if (inside(mouseX, mouseY, x, yy, w - 4, ROW_H)) g.fill(x, yy, x + w - 4, yy + ROW_H - 1, HOVER);
-            g.text(this.font, name, x + 6, yy + 6, TEXT, true);
+            g.text(this.font, name, x + 6, yy + 5, TEXT, false);
             int deleteX = x + w - 54, renameX = deleteX - 62, exportX = renameX - 60, loadX = exportX - 50;
             renderMiniButton(g, mouseX, mouseY, loadX, yy + 1, 44, "Load", SOURCE_ACCENT);
             renderMiniButton(g, mouseX, mouseY, exportX, yy + 1, 54, "Export", APPEARANCE_ACCENT);
