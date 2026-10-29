@@ -33,25 +33,23 @@ public final class BlockAppearanceScreen extends Screen {
     private enum Tab { EDITOR, CHANGED, KUUDRA_BLOCKS, PRESETS, SAVES, CONFIG }
 
     // KBA palette (ARGB)
-    private static final int BG = 0xE60D0507;
-    private static final int PANEL = 0xFF1A0A10;
-    private static final int PANEL_BORDER = 0xFF4A1626;
-    private static final int PANEL_TOP_ACCENT = 0xFFE0283C;
-    private static final int SOURCE_ACCENT = 0xFFE0283C;
-    private static final int APPEARANCE_ACCENT = 0xFFC2187A;
-    private static final int TEXT = 0xFFF5ECEF;
-    private static final int MUTED = 0xFFC3A7B1;
-    private static final int DANGER = 0xFF8A1F3A;
+    private static final int BG = 0xF00D0E11;
+    private static final int PANEL = 0xFF18191E;
+    private static final int PANEL_BORDER = 0xFF323037;
+    private static final int PANEL_TOP_ACCENT = 0xFF24252B;
+    private static final int SOURCE_ACCENT = 0xFFC64B54;
+    private static final int APPEARANCE_ACCENT = 0xFFAC6067;
+    private static final int TEXT = 0xFFF0ECEE;
+    private static final int MUTED = 0xFF99979E;
+    private static final int DANGER = 0xFF82383E;
     private static final int HOVER = 0x0DFFFFFF;
-    private static final int SELECTED = 0x26E0283C;
+    private static final int SELECTED = 0x553D2227;
     private static final int SUCCESS = 0xFF69D38B;
     private static final int DARK_TEXT = 0xFFF5ECEF;
 
-    private static final int OUTER = 16;
-    private static final int GAP = 12;
-    private static final int ROW_H = 20;
-    private static final int BODY_TOP = 66;
-    private static final int FOOTER_H = 26;
+    private static final int GAP = 8;
+    private static final int ROW_H = 18;
+    private static final int FOOTER_H = 22;
 
     private final Screen parent;
     private Tab tab = Tab.EDITOR;
@@ -110,36 +108,44 @@ public final class BlockAppearanceScreen extends Screen {
         init();
     }
 
-    private int bodyBottom() { return Math.max(BODY_TOP + 120, this.height - FOOTER_H - 8); }
-    private int bodyHeight() { return bodyBottom() - BODY_TOP; }
-    private int usableWidth() { return Math.max(260, this.width - OUTER * 2); }
-    private int editorLeftWidth() { return Math.max(180, (usableWidth() - GAP) * 56 / 100); }
-    private int editorRightX() { return OUTER + editorLeftWidth() + GAP; }
+    private int windowWidth() { return Math.min(590, Math.max(510, this.width - 72)); }
+    private int windowHeight() { return Math.min(370, Math.max(340, this.height - 72)); }
+    private int windowX() { return (this.width - windowWidth()) / 2; }
+    private int windowY() { return (this.height - windowHeight()) / 2; }
+    private int windowRight() { return windowX() + windowWidth(); }
+    private int windowBottom() { return windowY() + windowHeight(); }
+    private int outer() { return windowX() + 142; }
+    private int bodyTop() { return windowY() + 12; }
+    private int bodyBottom() { return windowBottom() - FOOTER_H - 8; }
+    private int bodyHeight() { return bodyBottom() - bodyTop(); }
+    private int usableWidth() { return windowRight() - outer() - 16; }
+    private int editorLeftWidth() { return Math.max(180, (usableWidth() - GAP) * 52 / 100); }
+    private int editorRightX() { return outer() + editorLeftWidth() + GAP; }
     private int editorRightWidth() { return Math.max(150, usableWidth() - GAP - editorLeftWidth()); }
-    private int editorListY() { return BODY_TOP + 86; }
-    private int editorListHeight() { return Math.max(48, bodyBottom() - editorListY() - 12); }
+    private int editorListY() { return bodyTop() + 79; }
+    private int editorListHeight() { return Math.max(48, bodyBottom() - editorListY() - 8); }
 
     private void buildEditor() {
-        int leftX = OUTER;
+        int leftX = outer();
         int leftW = editorLeftWidth();
         int rightX = editorRightX();
         int rightW = editorRightWidth();
 
-        search = new EditBox(this.font, leftX + 30, BODY_TOP + 31, Math.max(80, leftW - 42), 18, Component.literal("Search blocks"));
+        search = new EditBox(this.font, leftX + 30, bodyTop() + 31, Math.max(80, leftW - 42), 18, Component.literal("Search blocks"));
         search.setMaxLength(128);
         search.setHint(Component.literal("Search blocks..."));
         search.setValue(searchText);
         search.setResponder(v -> { searchText = v; editorScroll = 0; });
         addRenderableWidget(search);
 
-        source = new EditBox(this.font, rightX + 12, BODY_TOP + 34, Math.max(70, rightW - 24), 20, Component.literal("Source block"));
+        source = new EditBox(this.font, rightX + 12, bodyTop() + 34, Math.max(70, rightW - 24), 20, Component.literal("Source block"));
         source.setMaxLength(128);
         source.setHint(Component.literal("minecraft:cyan_terracotta"));
         source.setValue(editorSourceText);
         source.setResponder(v -> editorSourceText = v);
         addRenderableWidget(source);
 
-        replacement = new EditBox(this.font, rightX + 12, BODY_TOP + 82, Math.max(70, rightW - 24), 20, Component.literal("Appearance"));
+        replacement = new EditBox(this.font, rightX + 12, bodyTop() + 82, Math.max(70, rightW - 24), 20, Component.literal("Appearance"));
         replacement.setMaxLength(128);
         replacement.setHint(Component.literal("minecraft:moss_block"));
         replacement.setValue(editorReplacementText);
@@ -174,9 +180,9 @@ public final class BlockAppearanceScreen extends Screen {
     }
 
     private void buildSaves() {
-        int panelX = OUTER;
+        int panelX = outer();
         int panelW = usableWidth();
-        saveName = new EditBox(this.font, panelX + 12, BODY_TOP + 34, Math.min(260, Math.max(100, panelW - 250)), 20, Component.literal("Save name"));
+        saveName = new EditBox(this.font, panelX + 12, bodyTop() + 34, Math.min(260, Math.max(100, panelW - 250)), 20, Component.literal("Save name"));
         saveName.setMaxLength(96);
         saveName.setHint(Component.literal("My Kuudra setup"));
         saveName.setValue(saveNameText);
@@ -357,15 +363,40 @@ public final class BlockAppearanceScreen extends Screen {
     private int firstVisibleRow(double scroll) { return Math.max(0, (int) (scroll / ROW_H)); }
     private int rowYOffset(double scroll) { return -((int) scroll % ROW_H); }
     private boolean inside(double mx, double my, int x, int y, int w, int h) { return mx >= x && mx < x + w && my >= y && my < y + h; }
-    private int genericListY() { return BODY_TOP + 36; }
+    private int genericListY() { return bodyTop() + 32; }
     private int genericListHeight() { return Math.max(50, bodyBottom() - genericListY() - 12); }
-    private int savesListY() { return BODY_TOP + 70; }
+    private int savesListY() { return bodyTop() + 66; }
     private int savesListHeight() { return Math.max(50, bodyBottom() - savesListY() - 12); }
 
+    // Rounded rectangles use eight inset scanlines, no textures or shader effects.
+    private void roundedFill(GuiGraphicsExtractor g, int x, int y, int w, int h, int color) {
+        if (w < 18 || h < 18) { g.fill(x, y, x + w, y + h, color); return; }
+        int[] inset = {5, 3, 2, 1, 1, 0, 0, 0};
+        for (int i = 0; i < 8; i++) {
+            g.fill(x + inset[i], y + i, x + w - inset[i], y + i + 1, color);
+            g.fill(x + inset[i], y + h - i - 1, x + w - inset[i], y + h - i, color);
+        }
+        g.fill(x, y + 8, x + w, y + h - 8, color);
+    }
+
+    private void roundedOutline(GuiGraphicsExtractor g, int x, int y, int w, int h, int color) {
+        if (w < 18 || h < 18) { outline(g, x, y, w, h, color); return; }
+        int[] inset = {5, 3, 2, 1, 1, 0, 0, 0};
+        g.fill(x + 5, y, x + w - 5, y + 1, color);
+        g.fill(x + 5, y + h - 1, x + w - 5, y + h, color);
+        for (int i = 1; i < 8; i++) {
+            g.fill(x + inset[i], y + i, x + inset[i] + 1, y + i + 1, color);
+            g.fill(x + w - inset[i] - 1, y + i, x + w - inset[i], y + i + 1, color);
+            g.fill(x + inset[i], y + h - i - 1, x + inset[i] + 1, y + h - i, color);
+            g.fill(x + w - inset[i] - 1, y + h - i - 1, x + w - inset[i], y + h - i, color);
+        }
+        g.fill(x, y + 8, x + 1, y + h - 8, color);
+        g.fill(x + w - 1, y + 8, x + w, y + h - 8, color);
+    }
+
     private void panel(GuiGraphicsExtractor g, int x, int y, int w, int h) {
-        g.fill(x, y, x + w, y + h, PANEL);
-        outline(g, x, y, w, h, PANEL_BORDER);
-        g.fill(x + 1, y + 1, x + w - 1, y + 3, PANEL_TOP_ACCENT);
+        roundedFill(g, x, y, w, h, PANEL);
+        roundedOutline(g, x, y, w, h, PANEL_BORDER);
     }
 
     private void outline(GuiGraphicsExtractor g, int x, int y, int w, int h, int color) {
@@ -376,13 +407,13 @@ public final class BlockAppearanceScreen extends Screen {
     }
 
     private void centeredShadow(GuiGraphicsExtractor g, String text, int centerX, int y, int color) {
-        g.text(this.font, text, centerX - this.font.width(text) / 2, y, color, true);
+        g.text(this.font, text, centerX - this.font.width(text) / 2, y, color, false);
     }
 
     private void renderButton(GuiGraphicsExtractor g, int mouseX, int mouseY, int x, int y, int w, int h, String label, int fill, int border, int textColor) {
         boolean hover = inside(mouseX, mouseY, x, y, w, h);
-        g.fill(x, y, x + w, y + h, hover ? lighten(fill) : fill);
-        outline(g, x, y, w, h, border);
+        roundedFill(g, x, y, w, h, hover ? lighten(fill) : fill);
+        roundedOutline(g, x, y, w, h, border);
         centeredShadow(g, label, x + w / 2, y + (h - 8) / 2, textColor);
     }
 
@@ -395,51 +426,43 @@ public final class BlockAppearanceScreen extends Screen {
     }
 
     private void renderHeaderAndTabs(GuiGraphicsExtractor g, int mouseX, int mouseY) {
-        g.text(this.font, "Kuudra Mod Editor", OUTER, 15, TEXT, true);
-
-        String pill = KuudraDetector.isInKuudra() ? "KUUDRA ACTIVE" : "OUTSIDE KUUDRA";
-        int pillW = this.font.width(pill) + 16;
-        int pillX = this.width - OUTER - pillW;
-        int pillColor = KuudraDetector.isInKuudra() ? SUCCESS : SOURCE_ACCENT;
-        g.fill(pillX, 10, pillX + pillW, 29, PANEL);
-        outline(g, pillX, 10, pillW, 19, pillColor);
-        centeredShadow(g, pill, pillX + pillW / 2, 16, pillColor);
+        int wx = windowX(), wy = windowY(), ww = windowWidth(), wh = windowHeight();
+        roundedFill(g, wx, wy, ww, wh, 0xFF101115);
+        roundedOutline(g, wx, wy, ww, wh, PANEL_BORDER);
+        roundedFill(g, wx + 8, wy + 8, 124, wh - 16, PANEL);
+        g.fill(wx + 132, wy + 8, wx + 133, wy + wh - 8, PANEL_BORDER);
+        g.text(this.font, "KBA", wx + 22, wy + 22, TEXT, false);
+        g.text(this.font, "Kuudra Block", wx + 22, wy + 37, MUTED, false);
+        g.text(this.font, "Appearance", wx + 22, wy + 49, MUTED, false);
+        g.fill(wx + 20, wy + 68, wx + 116, wy + 69, PANEL_BORDER);
 
         String[] labels = {"Editor", "Changed", "Kuudra Blocks", "Presets", "Saves", "Config"};
-        int x = OUTER;
-        int y = 40;
-        int spacing = 18;
         for (int i = 0; i < labels.length; i++) {
-            int w = this.font.width(labels[i]);
+            int y = wy + 80 + i * 27;
             boolean active = tab.ordinal() == i;
-            int color = active ? TEXT : MUTED;
-            if (active) g.fill(x - 4, y - 3, x + w + 4, y + 16, 0x22E0283C);
-            g.text(this.font, labels[i], x, y, color, true);
-            if (active) g.fill(x, y + 13, x + w, y + 16, SOURCE_ACCENT);
-            x += w + spacing;
+            boolean hover = inside(mouseX, mouseY, wx + 16, y, 118, 25);
+            if (active || hover) roundedFill(g, wx + 16, y, 108, 23, active ? 0xFF342126 : 0xFF24252B);
+            if (active) g.fill(wx + 16, y, wx + 19, y + 23, SOURCE_ACCENT);
+            g.text(this.font, labels[i], wx + 28, y + 8, active ? TEXT : MUTED, false);
         }
     }
 
     private Tab tabAt(double mx, double my) {
-        if (my < 37 || my >= 58) return null;
-        String[] labels = {"Editor", "Changed", "Kuudra Blocks", "Presets", "Saves", "Config"};
-        int x = OUTER;
-        int spacing = 18;
-        for (int i = 0; i < labels.length; i++) {
-            int w = this.font.width(labels[i]);
-            if (mx >= x - 3 && mx < x + w + 3) return Tab.values()[i];
-            x += w + spacing;
-        }
-        return null;
+        int wx = windowX(), wy = windowY();
+        if (mx < wx + 16 || mx >= wx + 124 || my < wy + 80) return null;
+        int index = (int) ((my - wy - 80) / 27);
+        if (index < 0 || index >= Tab.values().length) return null;
+        int y = wy + 80 + index * 27;
+        return my < y + 23 ? Tab.values()[index] : null;
     }
 
     private void renderFooter(GuiGraphicsExtractor g) {
-        int y = this.height - FOOTER_H;
-        g.fill(OUTER, y, this.width - OUTER, y + 1, PANEL_BORDER);
+        int y = windowBottom() - FOOTER_H;
+        g.fill(outer(), y, windowRight() - 16, y + 1, PANEL_BORDER);
         String scope = KuudraDetector.isInKuudra()
                 ? "Kuudra detected via " + KuudraDetector.detectionSource() + " — replacements active"
                 : "Outside Kuudra — replacements disabled";
-        g.centeredText(this.font, scope, this.width / 2, y + 9, KuudraDetector.isInKuudra() ? MUTED : SOURCE_ACCENT);
+        g.centeredText(this.font, scope, outer() + usableWidth() / 2, y + 9, MUTED);
     }
 
     private void renderScrollBar(GuiGraphicsExtractor g, int x, int y, int h, int itemCount, double scroll) {
@@ -454,20 +477,20 @@ public final class BlockAppearanceScreen extends Screen {
     }
 
     private void renderEditorBackground(GuiGraphicsExtractor g) {
-        panel(g, OUTER, BODY_TOP, editorLeftWidth(), bodyHeight());
-        panel(g, editorRightX(), BODY_TOP, editorRightWidth(), bodyHeight());
+        panel(g, outer(), bodyTop(), editorLeftWidth(), bodyHeight());
+        panel(g, editorRightX(), bodyTop(), editorRightWidth(), bodyHeight());
         // Field accent borders sit underneath the vanilla text fields.
-        outline(g, editorRightX() + 10, BODY_TOP + 32, editorRightWidth() - 20, 24, SOURCE_ACCENT);
-        outline(g, editorRightX() + 10, BODY_TOP + 80, editorRightWidth() - 20, 24, APPEARANCE_ACCENT);
+        outline(g, editorRightX() + 10, bodyTop() + 32, editorRightWidth() - 20, 24, SOURCE_ACCENT);
+        outline(g, editorRightX() + 10, bodyTop() + 80, editorRightWidth() - 20, 24, APPEARANCE_ACCENT);
     }
 
     private void renderEditorForeground(GuiGraphicsExtractor g, int mouseX, int mouseY) {
-        int leftX = OUTER, leftW = editorLeftWidth();
+        int leftX = outer(), leftW = editorLeftWidth();
         int rightX = editorRightX(), rightW = editorRightWidth();
-        g.text(this.font, "Blocks", leftX + 12, BODY_TOP + 11, TEXT, true);
-        g.text(this.font, "⌕", leftX + 14, BODY_TOP + 36, MUTED, true);
+        g.text(this.font, "Blocks", leftX + 12, bodyTop() + 11, TEXT, true);
+        g.text(this.font, "⌕", leftX + 14, bodyTop() + 36, MUTED, true);
 
-        int toggleY = BODY_TOP + 58;
+        int toggleY = bodyTop() + 54;
         int toggleX = leftX + 12;
         int toggleW = Math.min(104, Math.max(72, (leftW - 30) / 2));
         renderToggle(g, mouseX, mouseY, toggleX, toggleY, toggleW, "Source", !listSetsReplacement, SOURCE_ACCENT);
@@ -475,11 +498,11 @@ public final class BlockAppearanceScreen extends Screen {
 
         renderEditorList(g, mouseX, mouseY);
 
-        g.text(this.font, "Source", rightX + 12, BODY_TOP + 18, SOURCE_ACCENT, true);
-        g.text(this.font, "Appearance", rightX + 12, BODY_TOP + 66, APPEARANCE_ACCENT, true);
+        g.text(this.font, "Source", rightX + 12, bodyTop() + 18, SOURCE_ACCENT, true);
+        g.text(this.font, "Appearance", rightX + 12, bodyTop() + 66, APPEARANCE_ACCENT, true);
 
-        int previewY = BODY_TOP + 116;
-        int previewH = 78;
+        int previewY = bodyTop() + 108;
+        int previewH = 62;
         g.fill(rightX + 12, previewY, rightX + rightW - 12, previewY + previewH, 0x66110E14);
         outline(g, rightX + 12, previewY, rightW - 24, previewH, PANEL_BORDER);
         g.text(this.font, "Preview", rightX + 22, previewY + 8, MUTED, true);
@@ -494,14 +517,14 @@ public final class BlockAppearanceScreen extends Screen {
         g.text(this.font, "→", rightX + rightW / 2 - 3, centerY - 4, MUTED, true);
         if (!toIcon.isEmpty()) g.item(toIcon, targetX, centerY - 8);
 
-        int buttonY = previewY + previewH + 12;
+        int buttonY = previewY + previewH + 8;
         renderButton(g, mouseX, mouseY, rightX + 12, buttonY, rightW - 24, 22, "Apply", SOURCE_ACCENT, SOURCE_ACCENT, DARK_TEXT);
         int half = (rightW - 30) / 2;
-        renderButton(g, mouseX, mouseY, rightX + 12, buttonY + 30, half, 22, "Reset block", PANEL, PANEL_BORDER, TEXT);
+        renderButton(g, mouseX, mouseY, rightX + 12, buttonY + 26, half, 22, "Reset block", PANEL, PANEL_BORDER, TEXT);
         String resetAllText = System.currentTimeMillis() < resetAllArmedUntil ? "Confirm reset all" : "Reset all";
-        renderButton(g, mouseX, mouseY, rightX + 18 + half, buttonY + 30, half, 22, resetAllText, PANEL, DANGER, TEXT);
+        renderButton(g, mouseX, mouseY, rightX + 18 + half, buttonY + 26, half, 22, resetAllText, PANEL, DANGER, TEXT);
 
-        if (!status.isBlank()) g.text(this.font, status, rightX + 12, Math.min(bodyBottom() - 16, buttonY + 62), MUTED, true);
+        if (!status.isBlank()) g.text(this.font, status, rightX + 12, Math.min(bodyBottom() - 16, buttonY + 54), MUTED, true);
     }
 
     private void renderToggle(GuiGraphicsExtractor g, int mouseX, int mouseY, int x, int y, int w, String label, boolean active, int accent) {
@@ -511,7 +534,7 @@ public final class BlockAppearanceScreen extends Screen {
     }
 
     private void renderEditorList(GuiGraphicsExtractor g, int mouseX, int mouseY) {
-        int x = OUTER + 12;
+        int x = outer() + 12;
         int y = editorListY();
         int w = editorLeftWidth() - 24;
         int h = editorListHeight();
@@ -536,11 +559,11 @@ public final class BlockAppearanceScreen extends Screen {
             ItemStack icon = blockIcon(id);
             if (!icon.isEmpty()) g.item(icon, x + 5, yy + 2);
             String name = BlockCatalog.displayName(id);
-            g.text(this.font, name, x + 26, yy + 6, TEXT, true);
+            g.text(this.font, name, x + 26, yy + 5, TEXT, false);
             int idW = this.font.width(id);
             int right = x + w - 12;
             if (x + 32 + this.font.width(name) + 10 < right - idW) {
-                g.text(this.font, id, right - idW, yy + 6, MUTED, true);
+                g.text(this.font, id, right - idW, yy + 5, MUTED, false);
             }
         }
         g.disableScissor();
@@ -548,12 +571,12 @@ public final class BlockAppearanceScreen extends Screen {
     }
 
     private void renderGenericPanel(GuiGraphicsExtractor g) {
-        panel(g, OUTER, BODY_TOP, usableWidth(), bodyHeight());
+        panel(g, outer(), bodyTop(), usableWidth(), bodyHeight());
     }
 
     private void renderChangedList(GuiGraphicsExtractor g, int mouseX, int mouseY) {
         List<Map.Entry<String, BlockAppearanceConfig.Rule>> rules = sortedRules();
-        int x = OUTER + 12, y = genericListY(), w = usableWidth() - 24, h = genericListHeight();
+        int x = outer() + 12, y = genericListY(), w = usableWidth() - 24, h = genericListHeight();
         changedScroll = clampScroll(changedScroll, rules.size(), h);
         g.enableScissor(x, y, x + w, y + h);
         int first = firstVisibleRow(changedScroll), yy = y + rowYOffset(changedScroll);
@@ -565,12 +588,12 @@ public final class BlockAppearanceScreen extends Screen {
             ItemStack fromIcon = blockIcon(from), toIcon = blockIcon(to);
             if (!fromIcon.isEmpty()) g.item(fromIcon, x + 4, yy + 2);
             int tx = x + 26;
-            g.text(this.font, from, tx, yy + 6, TEXT, true);
+            g.text(this.font, from, tx, yy + 5, TEXT, false);
             int arrowX = Math.min(x + w / 2 - 16, tx + this.font.width(from) + 12);
             g.text(this.font, "→", arrowX, yy + 6, MUTED, true);
             int targetX = arrowX + 20;
             if (!toIcon.isEmpty()) g.item(toIcon, targetX, yy + 2);
-            g.text(this.font, to, targetX + 22, yy + 6, TEXT, true);
+            g.text(this.font, to, targetX + 22, yy + 5, TEXT, false);
             int removeW = 58, removeX = x + w - removeW - 6;
             renderButton(g, mouseX, mouseY, removeX, yy + 1, removeW, 18, "Remove", PANEL, DANGER, TEXT);
         }
@@ -580,7 +603,7 @@ public final class BlockAppearanceScreen extends Screen {
 
     private void renderKuudraList(GuiGraphicsExtractor g, int mouseX, int mouseY) {
         List<String> blocks = availableKuudraBlocks();
-        int x = OUTER + 12, y = genericListY(), w = usableWidth() - 24, h = genericListHeight();
+        int x = outer() + 12, y = genericListY(), w = usableWidth() - 24, h = genericListHeight();
         kuudraScroll = clampScroll(kuudraScroll, blocks.size(), h);
         if (blocks.isEmpty()) {
             g.text(this.font, "No unmodified Kuudra blocks recorded yet", x, y + 8, MUTED, true);
@@ -594,7 +617,7 @@ public final class BlockAppearanceScreen extends Screen {
             if (hover) g.fill(x, yy, x + w - 4, yy + ROW_H - 1, HOVER);
             ItemStack icon = blockIcon(id);
             if (!icon.isEmpty()) g.item(icon, x + 4, yy + 2);
-            g.text(this.font, BlockCatalog.displayName(id), x + 26, yy + 6, TEXT, true);
+            g.text(this.font, BlockCatalog.displayName(id), x + 26, yy + 5, TEXT, false);
             int idW = this.font.width(id);
             g.text(this.font, id, x + w - idW - 12, yy + 6, MUTED, true);
         }
@@ -603,7 +626,7 @@ public final class BlockAppearanceScreen extends Screen {
     }
 
     private void renderPresets(GuiGraphicsExtractor g, int mouseX, int mouseY) {
-        int x = OUTER + 12, y = BODY_TOP + 42, w = usableWidth() - 24;
+        int x = outer() + 12, y = bodyTop() + 42, w = usableWidth() - 24;
         List<PresetManager.Preset> presets = PresetManager.builtIns();
         int yy = y;
         for (PresetManager.Preset preset : presets) {
@@ -619,10 +642,10 @@ public final class BlockAppearanceScreen extends Screen {
     }
 
     private void renderSaves(GuiGraphicsExtractor g, int mouseX, int mouseY) {
-        int x = OUTER + 12, w = usableWidth() - 24;
+        int x = outer() + 12, w = usableWidth() - 24;
         int saveButtonX = x + Math.min(272, Math.max(112, w - 246));
-        renderButton(g, mouseX, mouseY, saveButtonX, BODY_TOP + 33, 108, 22, "Save current", SOURCE_ACCENT, SOURCE_ACCENT, DARK_TEXT);
-        renderButton(g, mouseX, mouseY, saveButtonX + 116, BODY_TOP + 33, 104, 22, "Import JSONs", PANEL, APPEARANCE_ACCENT, TEXT);
+        renderButton(g, mouseX, mouseY, saveButtonX, bodyTop() + 33, 108, 22, "Save current", SOURCE_ACCENT, SOURCE_ACCENT, DARK_TEXT);
+        renderButton(g, mouseX, mouseY, saveButtonX + 116, bodyTop() + 33, 104, 22, "Import JSONs", PANEL, APPEARANCE_ACCENT, TEXT);
 
         List<String> names = SaveManager.names();
         int y = savesListY(), h = savesListHeight();
@@ -636,7 +659,7 @@ public final class BlockAppearanceScreen extends Screen {
         for (int i = first; i < names.size() && yy < y + h; i++, yy += ROW_H) {
             String name = names.get(i);
             if (inside(mouseX, mouseY, x, yy, w - 4, ROW_H)) g.fill(x, yy, x + w - 4, yy + ROW_H - 1, HOVER);
-            g.text(this.font, name, x + 6, yy + 6, TEXT, true);
+            g.text(this.font, name, x + 6, yy + 5, TEXT, false);
             int deleteX = x + w - 54, renameX = deleteX - 62, exportX = renameX - 60, loadX = exportX - 50;
             renderMiniButton(g, mouseX, mouseY, loadX, yy + 1, 44, "Load", SOURCE_ACCENT);
             renderMiniButton(g, mouseX, mouseY, exportX, yy + 1, 54, "Export", APPEARANCE_ACCENT);
@@ -654,8 +677,8 @@ public final class BlockAppearanceScreen extends Screen {
     }
 
     private void renderConfig(GuiGraphicsExtractor g, int mouseX, int mouseY) {
-        int x = OUTER + 12;
-        int y = BODY_TOP + 42;
+        int x = outer() + 12;
+        int y = bodyTop() + 42;
         int w = Math.min(300, usableWidth() - 24);
         KeyMapping key = KuudraAppearanceClient.openMenuKey();
         String label = listeningForKey ? "Press a key..." : "Open menu: " + key.getTranslatedKeyMessage().getString();
@@ -668,18 +691,18 @@ public final class BlockAppearanceScreen extends Screen {
     private void renderToast(GuiGraphicsExtractor g) {
         if (System.currentTimeMillis() >= toastUntil || toastMessage.isBlank()) return;
         int w = this.font.width(toastMessage) + 20;
-        int x = this.width / 2 - w / 2;
-        int y = BODY_TOP + 8;
+        int x = windowX() + windowWidth() / 2 - w / 2;
+        int y = bodyTop() + 8;
         g.fill(x, y, x + w, y + 22, 0xEE17301F);
         outline(g, x, y, w, 22, SUCCESS);
-        centeredShadow(g, toastMessage, this.width / 2, y + 7, SUCCESS);
+        centeredShadow(g, toastMessage, windowX() + windowWidth() / 2, y + 7, SUCCESS);
     }
 
     @Override
     public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
         double amount = -scrollY * ROW_H * 2.0;
         if (tab == Tab.EDITOR) {
-            int x = OUTER + 12, y = editorListY(), w = editorLeftWidth() - 24, h = editorListHeight();
+            int x = outer() + 12, y = editorListY(), w = editorLeftWidth() - 24, h = editorListHeight();
             if (inside(mouseX, mouseY, x, y, w, h)) {
                 editorScroll = clampScroll(editorScroll + amount, filteredBlocks(search == null ? searchText : search.getValue()).size(), h);
                 return true;
@@ -705,14 +728,14 @@ public final class BlockAppearanceScreen extends Screen {
             if (clickedTab != null) { setTab(clickedTab); return true; }
 
             if (tab == Tab.EDITOR) {
-                int leftX = OUTER, leftW = editorLeftWidth();
-                int toggleY = BODY_TOP + 58;
+                int leftX = outer(), leftW = editorLeftWidth();
+                int toggleY = bodyTop() + 54;
                 int toggleX = leftX + 12;
                 int toggleW = Math.min(104, Math.max(72, (leftW - 30) / 2));
                 if (inside(mx, my, toggleX, toggleY, toggleW, 20)) { listSetsReplacement = false; return true; }
                 if (inside(mx, my, toggleX + toggleW + 6, toggleY, toggleW, 20)) { listSetsReplacement = true; return true; }
 
-                int x = OUTER + 12, y = editorListY(), w = editorLeftWidth() - 24, h = editorListHeight();
+                int x = outer() + 12, y = editorListY(), w = editorLeftWidth() - 24, h = editorListHeight();
                 if (inside(mx, my, x, y, w, h)) {
                     List<String> ids = filteredBlocks(search == null ? searchText : search.getValue());
                     int index = (int) ((my - y + editorScroll) / ROW_H);
@@ -731,15 +754,15 @@ public final class BlockAppearanceScreen extends Screen {
                 }
 
                 int rightX = editorRightX(), rightW = editorRightWidth();
-                int previewY = BODY_TOP + 116, previewH = 78;
-                int buttonY = previewY + previewH + 12;
+                int previewY = bodyTop() + 108, previewH = 62;
+                int buttonY = previewY + previewH + 8;
                 if (inside(mx, my, rightX + 12, buttonY, rightW - 24, 22)) { apply(); return true; }
                 int half = (rightW - 30) / 2;
-                if (inside(mx, my, rightX + 12, buttonY + 30, half, 22)) { reset(); return true; }
-                if (inside(mx, my, rightX + 18 + half, buttonY + 30, half, 22)) { resetAll(); return true; }
+                if (inside(mx, my, rightX + 12, buttonY + 26, half, 22)) { reset(); return true; }
+                if (inside(mx, my, rightX + 18 + half, buttonY + 26, half, 22)) { resetAll(); return true; }
             } else if (tab == Tab.CHANGED) {
                 List<Map.Entry<String, BlockAppearanceConfig.Rule>> rules = sortedRules();
-                int x = OUTER + 12, y = genericListY(), w = usableWidth() - 24, h = genericListHeight();
+                int x = outer() + 12, y = genericListY(), w = usableWidth() - 24, h = genericListHeight();
                 if (inside(mx, my, x, y, w, h)) {
                     int index = (int) ((my - y + changedScroll) / ROW_H);
                     if (index >= 0 && index < rules.size()) {
@@ -759,13 +782,13 @@ public final class BlockAppearanceScreen extends Screen {
                 }
             } else if (tab == Tab.KUUDRA_BLOCKS) {
                 List<String> blocks = availableKuudraBlocks();
-                int x = OUTER + 12, y = genericListY(), w = usableWidth() - 24, h = genericListHeight();
+                int x = outer() + 12, y = genericListY(), w = usableWidth() - 24, h = genericListHeight();
                 if (inside(mx, my, x, y, w, h)) {
                     int index = (int) ((my - y + kuudraScroll) / ROW_H);
                     if (index >= 0 && index < blocks.size()) { openEditorForSource(blocks.get(index)); return true; }
                 }
                 int clearW = 128;
-                if (inside(mx, my, this.width - OUTER - clearW - 12, BODY_TOP + 10, clearW, 20)) {
+                if (inside(mx, my, windowRight() - 16 - clearW - 12, bodyTop() + 10, clearW, 20)) {
                     BlockAppearanceManager.clearObservedKuudraBlocks();
                     kuudraScroll = 0;
                     status = "Recorded Kuudra block list cleared";
@@ -773,17 +796,17 @@ public final class BlockAppearanceScreen extends Screen {
                     return true;
                 }
             } else if (tab == Tab.PRESETS) {
-                int x = OUTER + 12, y = BODY_TOP + 42, w = usableWidth() - 24, yy = y;
+                int x = outer() + 12, y = bodyTop() + 42, w = usableWidth() - 24, yy = y;
                 for (PresetManager.Preset preset : PresetManager.builtIns()) {
                     int bx = x + w - 66;
                     if (inside(mx, my, bx, yy + 13, 54, 22)) { applyPreset(preset); return true; }
                     yy += 56;
                 }
             } else if (tab == Tab.SAVES) {
-                int x = OUTER + 12, w = usableWidth() - 24;
+                int x = outer() + 12, w = usableWidth() - 24;
                 int saveButtonX = x + Math.min(272, Math.max(112, w - 246));
-                if (inside(mx, my, saveButtonX, BODY_TOP + 33, 108, 22)) { saveCurrent(); return true; }
-                if (inside(mx, my, saveButtonX + 116, BODY_TOP + 33, 104, 22)) { importSaves(); return true; }
+                if (inside(mx, my, saveButtonX, bodyTop() + 33, 108, 22)) { saveCurrent(); return true; }
+                if (inside(mx, my, saveButtonX + 116, bodyTop() + 33, 104, 22)) { importSaves(); return true; }
 
                 List<String> names = SaveManager.names();
                 int y = savesListY(), h = savesListHeight();
@@ -800,7 +823,7 @@ public final class BlockAppearanceScreen extends Screen {
                     }
                 }
             } else if (tab == Tab.CONFIG) {
-                int x = OUTER + 12, y = BODY_TOP + 42, w = Math.min(300, usableWidth() - 24);
+                int x = outer() + 12, y = bodyTop() + 42, w = Math.min(300, usableWidth() - 24);
                 if (inside(mx, my, x, y, w, 24)) {
                     listeningForKey = true;
                     return true;
@@ -840,7 +863,7 @@ public final class BlockAppearanceScreen extends Screen {
     @Override
     public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
         // Background and panel chrome first, then vanilla text fields/widgets, then KBA foreground.
-        graphics.fill(0, 0, this.width, this.height, BG);
+        graphics.fill(0, 0, this.width, this.height, 0xB0000000);
         renderHeaderAndTabs(graphics, mouseX, mouseY);
         if (tab == Tab.EDITOR) renderEditorBackground(graphics);
         else renderGenericPanel(graphics);
@@ -850,26 +873,26 @@ public final class BlockAppearanceScreen extends Screen {
         if (tab == Tab.EDITOR) {
             renderEditorForeground(graphics, mouseX, mouseY);
         } else if (tab == Tab.CHANGED) {
-            graphics.text(this.font, "Changed mappings (" + BlockAppearanceConfig.rules().size() + ")", OUTER + 12, BODY_TOP + 14, TEXT, true);
-            graphics.text(this.font, "Click a mapping to edit it.", OUTER + 160, BODY_TOP + 14, MUTED, true);
+            graphics.text(this.font, "Changed mappings (" + BlockAppearanceConfig.rules().size() + ")", outer() + 12, bodyTop() + 14, TEXT, true);
+            graphics.text(this.font, "Click a mapping to edit it.", outer() + 160, bodyTop() + 14, MUTED, true);
             renderChangedList(graphics, mouseX, mouseY);
         } else if (tab == Tab.KUUDRA_BLOCKS) {
             String detail = KuudraDetector.isInKuudra()
                     ? "Blocks learned from the current Kuudra arena. Changed blocks are hidden."
                     : "Enter Kuudra once to populate this list.";
-            graphics.text(this.font, detail, OUTER + 12, BODY_TOP + 14, MUTED, true);
+            graphics.text(this.font, detail, outer() + 12, bodyTop() + 14, MUTED, true);
             int clearW = 128;
-            renderButton(graphics, mouseX, mouseY, this.width - OUTER - clearW - 12, BODY_TOP + 10, clearW, 20, "Clear recorded list", PANEL, PANEL_BORDER, TEXT);
+            renderButton(graphics, mouseX, mouseY, windowRight() - 16 - clearW - 12, bodyTop() + 10, clearW, 20, "Clear recorded list", PANEL, PANEL_BORDER, TEXT);
             renderKuudraList(graphics, mouseX, mouseY);
         } else if (tab == Tab.PRESETS) {
-            graphics.text(this.font, "Built-in presets", OUTER + 12, BODY_TOP + 14, TEXT, true);
-            graphics.text(this.font, "Loading a preset copies it into your editable mappings.", OUTER + 116, BODY_TOP + 14, MUTED, true);
+            graphics.text(this.font, "Built-in presets", outer() + 12, bodyTop() + 14, TEXT, true);
+            graphics.text(this.font, "Loading a preset copies it into your editable mappings.", outer() + 116, bodyTop() + 14, MUTED, true);
             renderPresets(graphics, mouseX, mouseY);
         } else if (tab == Tab.SAVES) {
-            graphics.text(this.font, "User saves", OUTER + 12, BODY_TOP + 14, TEXT, true);
+            graphics.text(this.font, "User saves", outer() + 12, bodyTop() + 14, TEXT, true);
             renderSaves(graphics, mouseX, mouseY);
         } else if (tab == Tab.CONFIG) {
-            graphics.text(this.font, "Config", OUTER + 12, BODY_TOP + 14, TEXT, true);
+            graphics.text(this.font, "Config", outer() + 12, bodyTop() + 14, TEXT, true);
             renderConfig(graphics, mouseX, mouseY);
         }
 
